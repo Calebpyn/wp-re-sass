@@ -1,7 +1,4 @@
-//Auth0
-import { useAuth0 } from "@auth0/auth0-react";
 
-import React from "react";
 
 //React Roter
 import { useNavigate } from "react-router-dom";
@@ -11,7 +8,6 @@ function NotAuthPage() {
   const navigate = useNavigate();
 
   //Auth0
-  const { logout } = useAuth0();
 
   return (
     <div className="w-full h-screen flex justify-center items-center">

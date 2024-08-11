@@ -1,7 +1,7 @@
 //Import
 import { useEffect, useState } from "react";
 //Permissions list
-import { allowedUsersList } from "../../permissions/AllowedUsers";
+
 //Auth0
 import { useAuth0 } from "@auth0/auth0-react";
 //Components

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 //Icons
@@ -117,7 +117,9 @@ function Settings() {
             </div>
           </div>
           <div className="flex justify-between items-center">
-            <Button variant="contained" onClick={() => logout()}>Log Out</Button>
+            <Button variant="contained" onClick={() => logout()}>
+              Log Out
+            </Button>
             <span className="text-zinc-400">{user?.email}</span>
           </div>
         </div>
