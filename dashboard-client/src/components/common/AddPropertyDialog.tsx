@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import {
@@ -21,8 +21,14 @@ import {
 } from "../../types/PropertyInfoType";
 import React from "react";
 import { addPropertyDialog } from "../../types/AddPropertyDialogType";
-import { supabase } from "../../db/supabase";
 import CarouselDialog from "./CarouselDialog";
+import { CiImageOff } from "react-icons/ci";
+import { IoCloseOutline } from "react-icons/io5";
+
+type image = {
+  isClicked: boolean;
+  url: string;
+};
 
 const AddPropertyDialog: React.FC<addPropertyDialog> = ({
   getAllProperties,
@@ -52,6 +58,117 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
   }
 
   const { setIsDialogOpen } = context;
+
+  // Handeling image grid
+
+  //image display state
+  const [singleDisplay, setSingleDisplay] = useState<boolean>(false);
+
+  //Selected image for display
+  const [selectedImage, setSelectedImage] = useState<string>("");
+
+  //Selecting state
+  const [isSelecting, setIsSelecting] = useState<boolean>(false);
+
+  //Selected Images
+  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+
+  const [gridImages, setGridImages] = useState<image[]>([]);
+
+  const handleImages = async () => {
+    setIsLoading(true);
+    const response = await axios
+      .get(`${import.meta.env.VITE_REACT_APP_API_URL}/all_bucket_images`)
+      .catch((err) => {
+        console.log(err, "Axios error");
+      });
+    if (response) {
+      setGridImages(response.data);
+    } else {
+      alert("Something went wrong, contact support...");
+    }
+    setIsLoading(false);
+    setIsSelecting(false);
+    setSelectedFiles(null);
+  };
+
+  // Handle image click
+  const handleImageClick = (idx: number) => {
+    setGridImages((prevImages) =>
+      prevImages!.map((img, i) =>
+        i === idx ? { ...img, isClicked: !img.isClicked } : img
+      )
+    );
+  };
+
+  const handleAlreadySelected = (images: string[]) => {
+    // First, reset all objects' isClicked to false
+    const resetImages = gridImages!.map((img) => ({
+      ...img,
+      isClicked: false,
+    }));
+  
+    // Then, set isClicked to true for the selected images
+    const updatedImages = resetImages.map((img) => {
+      const isSelected = images.some((selectedImg) => selectedImg === img.url);
+      return isSelected ? { ...img, isClicked: true } : img;
+    });
+  
+    setGridImages(updatedImages);
+  };
+  
+
+  // Upload selected images
+  const handleUploadImages = async () => {
+    setIsLoading(true);
+    if (!selectedFiles || selectedFiles.length === 0) {
+      alert("Please select files to upload.");
+      return;
+    }
+
+    // Function to generate a unique filename
+    const generateUniqueFilename = () => {
+      const timestamp = Date.now();
+      const randomString = Math.random().toString(36).substring(2, 15); // Generate a random string
+      return `${timestamp}_${randomString}_asset`;
+    };
+
+    const uploadPromises = Array.from(selectedFiles).map(async (file) => {
+      const formData = new FormData();
+      const uniqueFilename = generateUniqueFilename();
+
+      formData.append("file", file, uniqueFilename); // Append file with unique name
+
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_REACT_APP_API_URL}/upload_image`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data", // Set correct content type
+            },
+          }
+        );
+        return response.data;
+      } catch (error: any) {
+        console.error("Error uploading file:", error);
+        return null;
+      }
+    });
+
+    try {
+      const results = await Promise.all(uploadPromises);
+      console.log("Upload successful:", results);
+      handleImages(); // Refresh the image list after upload
+      handleAlreadySelected(selectedProperty.images);
+    } catch (error) {
+      console.error("Error uploading images:", error);
+    }
+
+    setIsLoading(false);
+  };
+
+  // Handeling image grid
 
   const typeOptions = [
     { id: 1, value: "For Sale" },
@@ -116,35 +233,9 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
   const updateProperty = async () => {
     setIsLoading(true);
 
-    const tempPaths: string[] = [];
-    if (images) {
-      for (let i = 0; i < images.length; i++) {
-        const { data, error } = await supabase.storage
-          .from("property_images")
-          .upload(`public/image${generateRandomKey(10)}`, images[i]);
-
-        if (error) {
-          console.error("Error uploading image:", error.message);
-        } else if (data) {
-          const response1 = supabase.storage
-            .from("property_images")
-            .getPublicUrl(data.path);
-          tempPaths.push(response1!.data.publicUrl);
-        }
-      }
-    }
-
-    for (let i = 0; i < propertyInfo.images.length; i++) {
-      const { data, error } = await supabase.storage
-        .from("property_images")
-        .remove([propertyInfo.images[i]]);
-
-      if (error) {
-        console.error("Error uploading image:", error.message);
-      } else if (data) {
-        console.log(data)
-      }
-    }
+    const tempImageSelection: string[] = gridImages
+      .filter((image: image) => image.isClicked) // Filter images where isClicked is true
+      .map((image: image) => image.url); // Map the filtered images to their URLs
 
     let atts_es = propertyInfo.atts_es.split(",");
     let atts_en = propertyInfo.atts_en.split(",");
@@ -173,7 +264,7 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
       price: propertyInfo.price,
       currency: propertyInfo.currency,
       atts: temporalAtts,
-      images: tempPaths,
+      images: tempImageSelection
     };
 
     const response = await axios
@@ -197,28 +288,13 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
     }
   };
 
-  const [images, setImages] = useState<any>([]);
-
   //POST FUNCTION
   const handlePost = async () => {
     setIsLoading(true);
-    const tempPaths: string[] = [];
-    if (images) {
-      for (let i = 0; i < images.length; i++) {
-        const { data, error } = await supabase.storage
-          .from("property_images")
-          .upload(`public/image${generateRandomKey(10)}`, images[i]);
 
-        if (error) {
-          console.error("Error uploading image:", error.message);
-        } else if (data) {
-          const response1 = supabase.storage
-            .from("property_images")
-            .getPublicUrl(data.path);
-          tempPaths.push(response1!.data.publicUrl);
-        }
-      }
-    }
+    const tempImageSelection: string[] = gridImages
+    .filter((image: image) => image.isClicked) // Filter images where isClicked is true
+    .map((image: image) => image.url); // Map the filtered images to their URLs
 
     let atts_es = propertyInfo.atts_es.split(",");
     let atts_en = propertyInfo.atts_en.split(",");
@@ -247,7 +323,7 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
       price: propertyInfo.price,
       currency: propertyInfo.currency,
       atts: temporalAtts,
-      images: tempPaths,
+      images: tempImageSelection
     };
 
     const response = await axios
@@ -270,6 +346,7 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
     if (editProperty) {
       getAllPropertiesInnerCall();
     }
+    handleImages();
   }, []);
 
   const getAtts = (atts: att[], code: string) => {
@@ -308,23 +385,11 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
           atts_es: getAtts(allProperties[i].atts, "es")!,
           images: allProperties[i].images,
         });
+        handleAlreadySelected(allProperties[i].images);
         return;
       }
     }
   };
-
-  function generateRandomKey(length: number): string {
-    const characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let result = "";
-    const charactersLength = characters.length;
-
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-
-    return result;
-  }
 
   const [imagesDialog, setImagesDialog] = useState<boolean>(false);
 
@@ -333,215 +398,321 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
   };
 
   return (
-    <div className="w-full h-full bg-black bg-opacity-25 absolute z-[99] flex justify-center items-center">
+    <div className="w-full h-full shadow-2xl absolute z-[99] flex justify-center items-center">
       {imagesDialog ? (
         <CarouselDialog close={close} imgArray={selectedProperty.images} />
       ) : null}
-      <div className="bg-white shadow-xl p-10 rounded-sm">
-        {editProperty ? (
-          <div className="w-full mb-2">
+      <div className="bg-white shadow-xl rounded-sm max-h-[670px] pt-5">
+        <div className="overflow-y-auto h-[580px] pt-5 px-10">
+          {editProperty ? (
+            <div className="w-full mb-2">
+              <FormControl>
+                <InputLabel id="property_id_label">Id</InputLabel>
+                <Select
+                  required
+                  id="property_id"
+                  labelId="property_id_label"
+                  label="Id"
+                  onChange={(e) => handleIdSelection(e.target.value)}
+                  style={{ width: "200px" }}
+                  value={selectedProperty.id || ""}
+                >
+                  {allProperties.map((item: propertyFetchType) => (
+                    <MenuItem value={item.id} key={item.id}>
+                      {item.id} - {item.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+          ) : null}
+          <div className="flex items-center gap-2">
+            <TextField
+              required
+              id="name"
+              label="Name (English)"
+              variant="outlined"
+              style={{ width: "200px" }}
+              onChange={(e) => {
+                setPropertyInfo({
+                  ...propertyInfo,
+                  [e.target.id]: e.target.value,
+                });
+              }}
+              value={propertyInfo.name}
+            />
+            <TextField
+              required
+              id="name_es"
+              label="Name (Español)"
+              variant="outlined"
+              style={{ width: "200px" }}
+              onChange={(e) => {
+                setPropertyInfo({
+                  ...propertyInfo,
+                  [e.target.id]: e.target.value,
+                });
+              }}
+              value={propertyInfo.name_es}
+            />
             <FormControl>
-              <InputLabel id="property_id_label">Id</InputLabel>
+              <InputLabel id="property_type_label">Type</InputLabel>
               <Select
                 required
-                id="property_id"
-                labelId="property_id_label"
-                label="Id"
-                onChange={(e) => handleIdSelection(e.target.value)}
-                style={{ width: "200px" }}
-                value={selectedProperty.id || ""}
+                id="property_type"
+                labelId="property_type_label"
+                label="Type"
+                onChange={handleType}
+                style={{ width: "120px" }}
+                value={propertyInfo.type || ""}
               >
-                {allProperties.map((item: propertyFetchType) => (
-                  <MenuItem value={item.id} key={item.id}>
-                    {item.id} - {item.name}
+                {typeOptions.map((item) => (
+                  <MenuItem value={item.value} key={item.id}>
+                    {item.value}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
           </div>
-        ) : null}
-        <div className="flex items-center gap-2">
-          <TextField
-            required
-            id="name"
-            label="Name (English)"
-            variant="outlined"
-            style={{ width: "200px" }}
-            onChange={(e) => {
-              setPropertyInfo({
-                ...propertyInfo,
-                [e.target.id]: e.target.value,
-              });
-            }}
-            value={propertyInfo.name}
-          />
-          <TextField
-            required
-            id="name_es"
-            label="Name (Español)"
-            variant="outlined"
-            style={{ width: "200px" }}
-            onChange={(e) => {
-              setPropertyInfo({
-                ...propertyInfo,
-                [e.target.id]: e.target.value,
-              });
-            }}
-            value={propertyInfo.name_es}
-          />
-          <FormControl>
-            <InputLabel id="property_type_label">Type</InputLabel>
-            <Select
-              required
-              id="property_type"
-              labelId="property_type_label"
-              label="Type"
-              onChange={handleType}
-              style={{ width: "120px" }}
-              value={propertyInfo.type || ""}
-            >
-              {typeOptions.map((item) => (
-                <MenuItem value={item.value} key={item.id}>
-                  {item.value}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </div>
-        <div className="flex flex-col w-full gap-2">
-          <div className="mt-2 gap-2 flex flex-row w-full">
-            <TextField
-              required
-              id="desc"
-              label="Description (English)"
-              multiline
-              rows={4}
-              style={{ width: "100%" }}
-              onChange={(e) => {
-                setPropertyInfo({
-                  ...propertyInfo,
-                  [e.target.id]: e.target.value,
-                });
-              }}
-              value={propertyInfo.desc}
-            />
+          <div className="flex flex-col w-full gap-2">
+            <div className="mt-2 gap-2 flex flex-row w-full">
+              <TextField
+                required
+                id="desc"
+                label="Description (English)"
+                multiline
+                rows={4}
+                style={{ width: "100%" }}
+                onChange={(e) => {
+                  setPropertyInfo({
+                    ...propertyInfo,
+                    [e.target.id]: e.target.value,
+                  });
+                }}
+                value={propertyInfo.desc}
+              />
 
+              <TextField
+                required
+                id="desc_es"
+                label="Description (Español)"
+                multiline
+                rows={4}
+                style={{ width: "100%" }}
+                onChange={(e) => {
+                  setPropertyInfo({
+                    ...propertyInfo,
+                    [e.target.id]: e.target.value,
+                  });
+                }}
+                value={propertyInfo.desc_es}
+              />
+            </div>
+            <div>
+              <span className="text-zinc-500 font-light text-sm">
+                Attributes should be separated by a comma.
+              </span>
+            </div>
+            <div className="mt-2 gap-2 flex flex-row w-full">
+              <TextField
+                required
+                id="atts_en"
+                label="Attributes (English)"
+                multiline
+                rows={4}
+                style={{ width: "100%" }}
+                onChange={(e) => {
+                  setPropertyInfo({
+                    ...propertyInfo,
+                    [e.target.id]: e.target.value,
+                  });
+                }}
+                value={propertyInfo.atts_en}
+              />
+              <TextField
+                required
+                id="atts_es"
+                label="Attributes (Español)"
+                multiline
+                rows={4}
+                style={{ width: "100%" }}
+                onChange={(e) => {
+                  setPropertyInfo({
+                    ...propertyInfo,
+                    [e.target.id]: e.target.value,
+                  });
+                }}
+                value={propertyInfo.atts_es}
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-2 w-full mt-2">
             <TextField
               required
-              id="desc_es"
-              label="Description (Español)"
-              multiline
-              rows={4}
-              style={{ width: "100%" }}
+              id="price"
+              label="Price"
+              variant="outlined"
+              type="number"
+              style={{ width: "200px" }}
               onChange={(e) => {
                 setPropertyInfo({
                   ...propertyInfo,
                   [e.target.id]: e.target.value,
                 });
               }}
-              value={propertyInfo.desc_es}
+              value={propertyInfo.price}
             />
+            <FormControl>
+              <InputLabel id="currency_label">Currency</InputLabel>
+              <Select
+                required
+                id="currency"
+                labelId="currency_label"
+                label="Currency"
+                onChange={handleCurrency}
+                style={{ width: "120px" }}
+                value={propertyInfo.currency || ""}
+              >
+                {currencyOptions.map((item) => (
+                  <MenuItem value={item.value} key={item.id}>
+                    {item.value}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </div>
-          <div>
-            <span className="text-zinc-500 font-light text-sm">
-              Attributes should be separated by a comma.
-            </span>
-          </div>
-          <div className="mt-2 gap-2 flex flex-row w-full">
-            <TextField
-              required
-              id="atts_en"
-              label="Attributes (English)"
-              multiline
-              rows={4}
-              style={{ width: "100%" }}
-              onChange={(e) => {
-                setPropertyInfo({
-                  ...propertyInfo,
-                  [e.target.id]: e.target.value,
-                });
-              }}
-              value={propertyInfo.atts_en}
-            />
-            <TextField
-              required
-              id="atts_es"
-              label="Attributes (Español)"
-              multiline
-              rows={4}
-              style={{ width: "100%" }}
-              onChange={(e) => {
-                setPropertyInfo({
-                  ...propertyInfo,
-                  [e.target.id]: e.target.value,
-                });
-              }}
-              value={propertyInfo.atts_es}
-            />
+          <div className="my-2 flex flex-col">
+            {isLoading ? (
+              <CircularProgress />
+            ) : (
+              <div className="border-[1px] border-zinc-200 w-[700px] rounded-md flex justify-center items-center h-[400px]">
+                {singleDisplay ? (
+                  <div className="absolute w-screen h-full z-[999] flex justify-center items-center">
+                    <div className="flex flex-col items-center bg-white p-5 rounded-sm gap-2 shadow-2xl">
+                      <span className="w-full flex justify-end">
+                        <IoCloseOutline
+                          className="text-2xl hover:text-red-400 tr cursor-pointer"
+                          onClick={() => setSingleDisplay(false)}
+                        />
+                      </span>
+                      <div>
+                        <img src={selectedImage} className="max-h-[500px]" />
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+                {isLoading ? (
+                  <CircularProgress />
+                ) : (
+                  <div className="flex flex-col justify-start items-center w-full h-full">
+                    <div className="w-full h-[50px] border-b-[1px] border-zinc-200 flex justify-end items-center px-3 gap-3">
+                      <Button
+                        onClick={() => {
+                          if (isSelecting) {
+                            setIsSelecting(false);
+                          } else {
+                            setIsSelecting(true);
+                          }
+                        }}
+                        variant={isSelecting ? "contained" : "outlined"}
+                      >
+                        {isSelecting ? "CANCEL" : "SELECT"}
+                      </Button>
+                      <input
+                        type="file"
+                        multiple
+                        onChange={(e) => setSelectedFiles(e.target.files)}
+                        className="hidden"
+                        id="upload-input"
+                      />
+                      <label htmlFor="upload-input">
+                        <Button variant="contained" component="span">
+                          UPLOAD
+                        </Button>
+                      </label>
+                      {selectedFiles && (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={handleUploadImages}
+                        >
+                          UPLOAD SELECTED {`(${selectedFiles.length})`}
+                        </Button>
+                      )}
+                    </div>
+                    {gridImages!.length == 0 ? (
+                      <div className="flex flex-col justify-center items-center w-full h-full">
+                        <span>
+                          <CiImageOff className="text-7xl text-zinc-500" />
+                        </span>
+                        <span>Upload images</span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col justify-start items-center h-full w-full p-3">
+                        <div className="grid grid-cols-6 gap-3">
+                          {gridImages!.map((image: image, idx) => (
+                            <div
+                              key={idx}
+                              className={`relative w-[105px] h-[105px] bg-zinc-400 bg-cover cursor-pointer bg-center tr ${
+                                isSelecting
+                                  ? "hover:scale-90"
+                                  : "hover:scale-105"
+                              } ${
+                                isSelecting && image.isClicked ? "scale-90" : ""
+                              }`}
+                              style={{ backgroundImage: `url(${image.url})` }}
+                              onClick={() => {
+                                if (isSelecting) {
+                                  handleImageClick(idx);
+                                } else {
+                                  setSelectedImage(image.url);
+                                  setSingleDisplay(true);
+                                }
+                              }}
+                            >
+                              <div
+                                className={`absolute inset-0 bg-black opacity-0 ${
+                                  isSelecting && image.isClicked
+                                    ? "opacity-50"
+                                    : ""
+                                } tr`}
+                              ></div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
-        <div className="flex items-center gap-2 w-full mt-2">
-          <TextField
-            required
-            id="price"
-            label="Price"
-            variant="outlined"
-            type="number"
-            style={{ width: "200px" }}
-            onChange={(e) => {
-              setPropertyInfo({
-                ...propertyInfo,
-                [e.target.id]: e.target.value,
-              });
-            }}
-            value={propertyInfo.price}
-          />
-          <FormControl>
-            <InputLabel id="currency_label">Currency</InputLabel>
-            <Select
-              required
-              id="currency"
-              labelId="currency_label"
-              label="Currency"
-              onChange={handleCurrency}
-              style={{ width: "120px" }}
-              value={propertyInfo.currency || ""}
-            >
-              {currencyOptions.map((item) => (
-                <MenuItem value={item.value} key={item.id}>
-                  {item.value}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </div>
-        <div className="my-2">
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => setImages(e.target.files)}
-          />
-        </div>
-        <div className="mt-2 flex justify-between">
-          <div className="flex gap-2">
-            <Button
-              variant="contained"
-              onClick={() => {
-                if (editProperty) {
-                  updateProperty();
-                } else {
-                  handlePost();
-                }
-              }}
-            >
-              {isLoading ? <CircularProgress color="inherit" /> : "Save"}
-            </Button>
-            <Button variant="outlined" onClick={() => setIsDialogOpen(false)}>
-              Cancel
-            </Button>
+        <div className="h-[70px] px-10">
+          <div className="mt-2 flex justify-between">
+            <div className="flex gap-2">
+              <Button
+                variant="contained"
+                onClick={() => {
+                  if (editProperty) {
+                    updateProperty();
+                  } else {
+                    handlePost();
+                  }
+                }}
+              >
+                {isLoading ? <CircularProgress color="inherit" /> : "Save"}
+              </Button>
+              <Button variant="outlined" onClick={() => setIsDialogOpen(false)}>
+                Cancel
+              </Button>
+            </div>
+            {editProperty ? (
+              <Button onClick={() => setImagesDialog(!imagesDialog)}>
+                Images
+              </Button>
+            ) : null}
           </div>
-          <Button onClick={() => setImagesDialog(!imagesDialog)}>Images</Button>
         </div>
       </div>
     </div>
