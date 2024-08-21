@@ -177,7 +177,7 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
   ];
 
   const currencyOptions = [
-    { id: 1, value: "US" },
+    { id: 1, value: "USD" },
     { id: 2, value: "MX" },
   ];
 
