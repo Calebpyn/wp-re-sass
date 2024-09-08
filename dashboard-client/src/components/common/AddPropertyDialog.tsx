@@ -24,6 +24,8 @@ import { addPropertyDialog } from "../../types/AddPropertyDialogType";
 import CarouselDialog from "./CarouselDialog";
 import { CiImageOff } from "react-icons/ci";
 import { IoCloseOutline } from "react-icons/io5";
+import AddressToCoords from "./AddressToCoords";
+import { coordsType } from "../../types/AddressToCoordsTypes";
 
 type image = {
   isClicked: boolean;
@@ -60,6 +62,9 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
   const { setIsDialogOpen } = context;
 
   // Handeling image grid
+
+  // coords state
+  const [coords, setCoords] = useState<coordsType | null>(null);
 
   //image display state
   const [singleDisplay, setSingleDisplay] = useState<boolean>(false);
@@ -107,16 +112,15 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
       ...img,
       isClicked: false,
     }));
-  
+
     // Then, set isClicked to true for the selected images
     const updatedImages = resetImages.map((img) => {
       const isSelected = images.some((selectedImg) => selectedImg === img.url);
       return isSelected ? { ...img, isClicked: true } : img;
     });
-  
+
     setGridImages(updatedImages);
   };
-  
 
   // Upload selected images
   const handleUploadImages = async () => {
@@ -264,7 +268,9 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
       price: propertyInfo.price,
       currency: propertyInfo.currency,
       atts: temporalAtts,
-      images: tempImageSelection
+      images: tempImageSelection,
+      lat: coords?.lat,
+      lng: coords?.lng,
     };
 
     const response = await axios
@@ -293,8 +299,8 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
     setIsLoading(true);
 
     const tempImageSelection: string[] = gridImages
-    .filter((image: image) => image.isClicked) // Filter images where isClicked is true
-    .map((image: image) => image.url); // Map the filtered images to their URLs
+      .filter((image: image) => image.isClicked) // Filter images where isClicked is true
+      .map((image: image) => image.url); // Map the filtered images to their URLs
 
     let atts_es = propertyInfo.atts_es.split(",");
     let atts_en = propertyInfo.atts_en.split(",");
@@ -323,7 +329,9 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
       price: propertyInfo.price,
       currency: propertyInfo.currency,
       atts: temporalAtts,
-      images: tempImageSelection
+      images: tempImageSelection,
+      lat: coords?.lat,
+      lng: coords?.lng,
     };
 
     const response = await axios
@@ -384,6 +392,10 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
           atts_en: getAtts(allProperties[i].atts, "en")!,
           atts_es: getAtts(allProperties[i].atts, "es")!,
           images: allProperties[i].images,
+        });
+        setCoords({
+          lat: allProperties[i].lat,
+          lng: allProperties[i].lng,
         });
         handleAlreadySelected(allProperties[i].images);
         return;
@@ -686,6 +698,9 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
                 )}
               </div>
             )}
+          </div>
+          <div>
+            <AddressToCoords coords={coords} setCoords={setCoords} />
           </div>
         </div>
         <div className="h-[70px] px-10">

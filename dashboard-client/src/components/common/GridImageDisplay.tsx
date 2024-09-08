@@ -141,7 +141,7 @@ const GridImageDisplay: React.FC<GridImageDisplayType> = ({
 
   return (
     <div
-      className="border-[1px] border-zinc-200 w-[700px] rounded-md flex justify-center items-center"
+      className="border-[1px] border-zinc-200 w-[500px] rounded-md flex justify-center items-center"
       style={{ height: `${height}px` }}
     >
       {isDialog ? (
@@ -239,7 +239,7 @@ const GridImageDisplay: React.FC<GridImageDisplayType> = ({
             </div>
           ) : (
             <div className="flex flex-col justify-start items-center h-full w-full p-3">
-              <div className="grid grid-cols-6 gap-3">
+              <div className="grid grid-cols-4 gap-3 overflow-y-auto w-auto">
                 {images!.map((image: image, idx) => (
                   <div
                     key={idx}

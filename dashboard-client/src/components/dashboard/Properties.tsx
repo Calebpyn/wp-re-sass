@@ -65,11 +65,11 @@ function Properties() {
           currency: response.data[i].currency,
           atts_en: getAtts(response.data[i].atts, "en")!,
           atts_es: getAtts(response.data[i].atts, "es")!,
-          images: response.data[i].images
+          images: response.data[i].images,
         };
-        tempData.push(tempObject)
+        tempData.push(tempObject);
       }
-      
+
       setRows(tempData);
       setIsLoading(false);
     }
@@ -101,7 +101,7 @@ function Properties() {
 
   //Erase selection
   const eraseSelection = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     for (let i = 0; i < selectionModel.length; i++) {
       const response = await axios
         .delete(
@@ -115,7 +115,7 @@ function Properties() {
         });
       console.log(response);
     }
-    setIsLoading(false)
+    setIsLoading(false);
     getAllProperties();
   };
 

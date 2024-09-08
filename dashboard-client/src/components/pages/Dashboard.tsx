@@ -1,6 +1,4 @@
-import {
-  useContext,
-} from "react";
+import { useContext } from "react";
 import NavBar from "../common/NavBar";
 import { PageContext } from "../../App";
 import Home from "../dashboard/Home";
@@ -23,10 +21,10 @@ function Dashboard() {
     <div className="w-full max-w-screen-2xl h-screen flex flex-col justify-start items-center">
       <NavBar />
       <div className="h-[100px]"></div>
-      {currentPage === 1 && <Home />}
-      {currentPage === 2 && <Properties />}
-      {currentPage === 3 && <Settings />}
-      {currentPage === 4 && <Support />}
+      {currentPage == undefined || currentPage == 1 ? <Home /> : null}
+      {currentPage === 2 ? <Properties /> : null}
+      {currentPage === 3 ? <Settings /> : null}
+      {currentPage === 4 ? <Support /> : null}
     </div>
   );
 }
