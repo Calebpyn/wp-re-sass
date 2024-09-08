@@ -1,5 +1,4 @@
 import { componentType } from "../../types/PropertyCardTypes";
-import Carousel from "./Carousel";
 
 const PropertyCard: React.FC<componentType> = (
   {
