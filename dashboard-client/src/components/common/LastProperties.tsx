@@ -4,7 +4,7 @@ import { componentType } from "../../types/PropertyCardTypes";
 import PropertyCard from "./PropertyCard";
 
 function LastProperties() {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [_, setIsLoading] = useState<boolean>(false);
 
   const [lastTen, setLastTen] = useState<componentType[]>([]);
 
