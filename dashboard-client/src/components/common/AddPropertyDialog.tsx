@@ -660,8 +660,8 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
                         <span>Upload images</span>
                       </div>
                     ) : (
-                      <div className="flex flex-col justify-start items-center h-full w-full p-3">
-                        <div className="grid grid-cols-6 gap-3">
+                      <div className="flex flex-col justify-start items-center h-full w-full p-3 pb-14">
+                        <div className="grid grid-cols-6 gap-3 overflow-y-scroll">
                           {gridImages!.map((image: image, idx) => (
                             <div
                               key={idx}

@@ -1,10 +1,9 @@
 import { Button, CircularProgress } from "@mui/material";
 import axios from "axios";
-import React, {  useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoTrashOutline } from "react-icons/io5";
 import { CiImageOff } from "react-icons/ci";
 import { IoCloseOutline } from "react-icons/io5";
-
 
 //Image Type
 type image = {
@@ -16,9 +15,7 @@ type GridImageDisplayType = {
   height: string;
 };
 
-const GridImageDisplay: React.FC<GridImageDisplayType> = ({
-  height,
-}) => {
+const GridImageDisplay: React.FC<GridImageDisplayType> = ({ height }) => {
   //Images state
   const [images, setImages] = useState<image[]>([]);
 
@@ -49,7 +46,7 @@ const GridImageDisplay: React.FC<GridImageDisplayType> = ({
         console.log(err, "Axios error");
       });
     if (response) {
-      setImages(response.data)
+      setImages(response.data);
     } else {
       alert("Something went wrong, contact support...");
     }
@@ -238,7 +235,7 @@ const GridImageDisplay: React.FC<GridImageDisplayType> = ({
               <span>Upload images</span>
             </div>
           ) : (
-            <div className="flex flex-col justify-start items-center h-full w-full p-3">
+            <div className="flex flex-col justify-start items-center h-full w-full p-3 pb-14">
               <div className="grid grid-cols-4 gap-3 overflow-y-auto w-auto">
                 {images!.map((image: image, idx) => (
                   <div
