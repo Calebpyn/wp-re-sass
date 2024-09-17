@@ -18,7 +18,7 @@ function Dashboard() {
   const { currentPage } = context;
 
   return (
-    <div className="w-full max-w-screen-2xl h-screen flex flex-col justify-start items-center">
+    <div className="w-full max-w-screen-2xl flex flex-col justify-start items-center">
       <NavBar />
       <div className="h-[100px]"></div>
       {currentPage == undefined || currentPage == 1 ? <Home /> : null}
