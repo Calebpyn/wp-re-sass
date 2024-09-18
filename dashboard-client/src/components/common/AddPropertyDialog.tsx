@@ -410,7 +410,7 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
   };
 
   return (
-    <div className="w-full h-full shadow-2xl absolute z-[99] flex justify-center items-center">
+    <div className="w-full h-screen shadow-2xl absolute z-[99] flex justify-center items-center">
       {imagesDialog ? (
         <CarouselDialog close={close} imgArray={selectedProperty.images} />
       ) : null}
