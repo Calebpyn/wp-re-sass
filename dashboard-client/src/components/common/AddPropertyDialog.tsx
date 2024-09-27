@@ -370,32 +370,32 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
       if (allProperties[i].id == id) {
         setSelectedProperty({
           id: allProperties[i].id,
-          name_es: allProperties[i].name_es,
-          name: allProperties[i].name,
-          desc: allProperties[i].desc,
-          desc_es: allProperties[i].desc_es,
+          name_es: allProperties[i].name_es ?? "",
+          name: allProperties[i].name ?? "",
+          desc: allProperties[i].desc ?? "",
+          desc_es: allProperties[i].desc_es ?? "",
           type: allProperties[i].type,
           price: allProperties[i].price,
           currency: allProperties[i].currency,
-          atts_en: getAtts(allProperties[i].atts, "en")!,
-          atts_es: getAtts(allProperties[i].atts, "es")!,
+          atts_en: getAtts(allProperties[i].atts, "en")! ?? "",
+          atts_es: getAtts(allProperties[i].atts, "es")! ?? "",
           images: allProperties[i].images,
         });
         setPropertyInfo({
-          name_es: allProperties[i].name_es,
-          name: allProperties[i].name,
-          desc: allProperties[i].desc,
-          desc_es: allProperties[i].desc_es,
+          name_es: allProperties[i].name_es ?? "",
+          name: allProperties[i].name ?? "",
+          desc: allProperties[i].desc ?? "",
+          desc_es: allProperties[i].desc_es ?? "",
           type: allProperties[i].type,
           price: allProperties[i].price,
           currency: allProperties[i].currency,
-          atts_en: getAtts(allProperties[i].atts, "en")!,
-          atts_es: getAtts(allProperties[i].atts, "es")!,
+          atts_en: getAtts(allProperties[i].atts, "en")! ?? "",
+          atts_es: getAtts(allProperties[i].atts, "es")! ?? "",
           images: allProperties[i].images,
         });
         setCoords({
-          lat: allProperties[i].lat,
-          lng: allProperties[i].lng,
+          lat: allProperties[i].lat ?? "",
+          lng: allProperties[i].lng ?? "",
         });
         handleAlreadySelected(allProperties[i].images);
         return;
