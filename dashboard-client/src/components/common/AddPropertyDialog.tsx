@@ -364,7 +364,6 @@ const AddPropertyDialog: React.FC<addPropertyDialog> = ({
       return atts.map((att) => att.en).join(",");
     }
   };
-
   const handleIdSelection = (id: string) => {
     for (let i = 0; i < allProperties.length; i++) {
       if (allProperties[i].id == id) {
