@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from "react";
 import { DataGrid, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
 
 import { TbHomePlus } from "react-icons/tb";
-import AddPropertyDialog from "../common/AddPropertyDialog";
 import { Button, CircularProgress } from "@mui/material";
 import { DialogContext } from "../../App";
 
@@ -121,12 +120,7 @@ function Properties() {
 
   return (
     <div className="w-full h-full flex flex-col justify-start items-center relative">
-      {isDialogOpen ? (
-        <AddPropertyDialog
-          getAllProperties={getAllProperties}
-          editProperty={isEditing}
-        />
-      ) : null}
+      {isDialogOpen ? <div></div> : null}
       <div className="w-full h-[100px] flex justify-center items-center">
         <div className="w-[80%] flex justify-between items-center gap-2">
           <div className="gap-2 flex items-center">
