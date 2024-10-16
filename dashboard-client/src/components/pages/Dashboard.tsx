@@ -1,14 +1,21 @@
+//Hooks
 import { useContext } from "react";
-import NavBar from "../common/NavBar";
+
+//Context
 import { PageContext } from "../../App";
+
+//Components
+import NavBar from "../common/NavBar";
 import Home from "../dashboard/Home";
 import Properties from "../dashboard/Properties";
 import Settings from "../dashboard/Settings";
 import Support from "../dashboard/Support";
-
-// Define the context's type
+import InfoBar from "../common/InfoBar";
+import UploadFiles from "../dashboard/UploadFiles";
+import ImagesPage from "../dashboard/ImagesPage";
 
 function Dashboard() {
+  //Context
   const context = useContext(PageContext);
 
   if (!context) {
@@ -18,13 +25,17 @@ function Dashboard() {
   const { currentPage } = context;
 
   return (
-    <div className="w-full max-w-screen-2xl flex flex-col justify-start items-center">
+    <div className="w-full pl-[200px] h-screen">
       <NavBar />
-      <div className="h-[100px]"></div>
-      {currentPage == undefined || currentPage == 1 ? <Home /> : null}
-      {currentPage === 2 ? <Properties /> : null}
-      {currentPage === 3 ? <Settings /> : null}
-      {currentPage === 4 ? <Support /> : null}
+      <div className="w-full h-full flex flex-col justify-start relative pt-[100px]">
+        <InfoBar />
+        {currentPage == undefined || currentPage == 1 ? <Home /> : null}
+        {currentPage === 2 ? <Properties /> : null}
+        {currentPage === 3 ? <Settings /> : null}
+        {currentPage === 4 ? <Support /> : null}
+        {currentPage === 5 ? <ImagesPage /> : null}
+        {currentPage === 6 ? <UploadFiles isNewProperty={false} /> : null}
+      </div>
     </div>
   );
 }

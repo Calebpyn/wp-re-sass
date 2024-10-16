@@ -39,8 +39,10 @@ export type propertyFetchType = {
   type: string;
   price: string;
   currency: string;
-  atts: Array<att>;
-  images: Array<string>;
-  lat: number;
-  lng: number;
+  atts_es: Array<string>;
+  atts_en: Array<string>;
+  imgs: Array<string>;
+  lat: number | null;
+  lng: number | null;
+  address: string;
 };

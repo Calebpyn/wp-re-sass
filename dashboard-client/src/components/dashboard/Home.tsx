@@ -1,13 +1,10 @@
-import GridImageDisplay from "../common/GridImageDisplay";
-import LastProperties from "../common/LastProperties";
+import GridImage from "../common/GridImage";
 
 function Home() {
   return (
     <div className="relative p-5 h-full w-full">
       <div className="flex justify-around items-center w-full h-full">
-        <LastProperties />
-
-        <GridImageDisplay height="500" />
+        <GridImage />
       </div>
     </div>
   );

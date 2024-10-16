@@ -92,35 +92,46 @@ function Settings() {
                   >
                     <span>{item.email}</span>
                     <span>
-                      <IoMdClose
-                        className="hover:scale-110 tr cursor-pointer hover:text-red-500"
-                        onClick={() => handleAccessDelete(item.email, item.id)}
-                      />
+                      <span>
+                        {item.is_admin ? (
+                          <span className="text-zinc-400 font-light text-sm">
+                            Admin can't be deleted
+                          </span>
+                        ) : (
+                          <IoMdClose
+                            className="hover:scale-110 tr cursor-pointer hover:text-red-500"
+                            onClick={() =>
+                              handleAccessDelete(item.email, item.id)
+                            }
+                          />
+                        )}
+                      </span>
                     </span>
                   </span>
                 ))}
               </div>
             </div>
             <div className="my-2 flex gap-2">
-              <TextField
-                id="outlined-basic"
-                label="New Access"
-                variant="outlined"
-                style={{
-                  width: "300px",
-                }}
+              <input
+                placeholder="New Access"
+                className="border-[1px] border-black py-3 px-5 focus:outline-none"
                 onChange={(e) => setNewAccess(e.target.value)}
               />
-              <Button variant="contained" onClick={() => handlePostAccess()}>
+              <button
+                className="bg-zinc-300 px-5 text-zinc-800 hover:bg-main-blue hover:text-white tr"
+                onClick={() => handlePostAccess()}
+              >
                 <IoMdSave className="text-xl" />
-              </Button>
+              </button>
             </div>
           </div>
-          <div className="flex justify-between items-center">
-            <Button variant="contained" onClick={() => logout()}>
+          <div className="flex justify-start items-center">
+            <button
+              className="bg-zinc-300 py-3 px-5 text-zinc-800 hover:bg-main-blue hover:text-white tr"
+              onClick={() => logout()}
+            >
               Log Out
-            </Button>
-            <span className="text-zinc-400">{user?.email}</span>
+            </button>
           </div>
         </div>
       )}

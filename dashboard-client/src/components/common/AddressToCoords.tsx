@@ -1,6 +1,11 @@
+//Hooks
 import React, { useState, useRef, useEffect } from "react";
+
+//Google api
 import { GoogleMap, MarkerF, useLoadScript } from "@react-google-maps/api";
-import { componentType, coordsType } from "../../types/AddressToCoordsTypes";
+
+//Types
+import { propertyFetchType } from "../../types/PropertyInfoType";
 
 //Map styles
 const mapContainerStyle = {
@@ -8,13 +13,26 @@ const mapContainerStyle = {
   height: "500px",
 };
 
-//Initial location
-const center: coordsType = {
-  lat: 31.857777777778,
-  lng: -116.60583333333,
+type coordsNoAddress = {
+  lat: number;
+  lng: number;
 };
 
-const AddressToCoords: React.FC<componentType> = ({ coords, setCoords }) => {
+const center: coordsNoAddress = {
+  lat: 0,
+  lng: 0,
+};
+
+//Prop type
+type componentType = {
+  newPropertyInfo: propertyFetchType;
+  setNewPropertyInfo: React.Dispatch<React.SetStateAction<propertyFetchType>>;
+};
+
+const AddressToCoords: React.FC<componentType> = ({
+  newPropertyInfo,
+  setNewPropertyInfo,
+}) => {
   //Load the map
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env
@@ -22,7 +40,13 @@ const AddressToCoords: React.FC<componentType> = ({ coords, setCoords }) => {
     libraries: ["places"],
   });
 
-  const [markerPosition, setMarkerPosition] = useState<coordsType | null>(null);
+  //Marker position
+  const [markerPosition, setMarkerPosition] = useState<coordsNoAddress | null>(
+    null
+  );
+
+  //Location added
+  const [geoCodeState, setGeoCodeState] = useState<boolean>(false);
 
   //Refs
   const inputRef = useRef<HTMLInputElement>(null);
@@ -45,12 +69,14 @@ const AddressToCoords: React.FC<componentType> = ({ coords, setCoords }) => {
     geocoder
       .geocode(request)
       .then((result) => {
+        setGeoCodeState(true);
         const { results } = result;
         if (results && results[0]) {
           const location = results[0].geometry.location.toJSON();
           setMarkerPosition(location);
           mapRef.current?.setCenter(results[0].geometry.location);
-          setCoords({
+          setNewPropertyInfo({
+            ...newPropertyInfo,
             lat: location.lat,
             lng: location.lng,
           });
@@ -70,62 +96,81 @@ const AddressToCoords: React.FC<componentType> = ({ coords, setCoords }) => {
   };
 
   useEffect(() => {
-    if (coords) {
-      const lat = parseFloat(coords.lat.toString());
-      const lng = parseFloat(coords.lng.toString());
+    if (newPropertyInfo.lat && newPropertyInfo.lng) {
+      const lat = parseFloat(newPropertyInfo.lat.toString());
+      const lng = parseFloat(newPropertyInfo.lng.toString());
       if (!isNaN(lat) && !isNaN(lng)) {
         setMarkerPosition({ lat, lng });
       } else {
-        console.error("Invalid coords received:", coords);
+        console.error(
+          "Invalid coords received:",
+          newPropertyInfo.lat,
+          newPropertyInfo.lng
+        );
       }
     }
-  }, [coords]);
+  }, [newPropertyInfo]);
 
   //If not loaded
   if (!isLoaded) return <div>Loading...</div>;
 
   return (
-    <div>
-      <div className="w-full flex justify-start gap-5 p-2 items-center">
+    <div className="w-[70%]">
+      <div className="w-full flex justify-start gap-5 mb-5">
         <input
           type="text"
           ref={inputRef}
           placeholder="Enter a location"
-          className="py-2 px-3 border-[1px] border-zinc-400 rounded-sm"
+          className="py-2 px-3 border-[1px] border-black focus:outline-none w-full"
+          value={newPropertyInfo.address}
+          onChange={(e) =>
+            setNewPropertyInfo({
+              ...newPropertyInfo,
+              address: e.target.value,
+            })
+          }
         />
         <button
           onClick={handleGeocode}
-          className="py-2 flex justify-center items-center bg-blue-500 text-white rounded-sm w-[100px] shadow-sm"
+          className="px-5 py-2 bg-zinc-200 hover:bg-zinc-400 tr w-[150px]"
         >
-          Geocode
+          Locate
         </button>
       </div>
 
-      <GoogleMap
-        mapContainerStyle={mapContainerStyle}
-        center={markerPosition || center}
-        zoom={10}
-        onLoad={onMapLoad}
-      >
-        {markerPosition && <MarkerF position={markerPosition} />}
-      </GoogleMap>
+      {geoCodeState ? (
+        <GoogleMap
+          mapContainerStyle={mapContainerStyle}
+          center={markerPosition || center}
+          zoom={10}
+          onLoad={onMapLoad}
+        >
+          {markerPosition && <MarkerF position={markerPosition} />}
+        </GoogleMap>
+      ) : (
+        <span className="text-sm text-zinc-500">
+          Map will display when the address is located.
+        </span>
+      )}
     </div>
   );
 };
 
-// Wrap the component with React.memo
-export default React.memo(AddressToCoords, (prevProps, nextProps) => {
-  if (prevProps.coords === nextProps.coords) return true;
+export default AddressToCoords;
 
-  if (prevProps.coords && nextProps.coords) {
-    return (
-      prevProps.coords.lat === nextProps.coords.lat &&
-      prevProps.coords.lng === nextProps.coords.lng
-    );
-  }
+// // Wrap the component with React.memo
+// export default React.memo(AddressToCoords, (prevProps, nextProps) => {
+//   if (prevProps.coords === nextProps.coords) return true;
 
-  return (
-    prevProps.coords === nextProps.coords &&
-    prevProps.setCoords === nextProps.setCoords
-  );
-});
+//   if (prevProps.coords && nextProps.coords) {
+//     return (
+//       prevProps.coords.lat === nextProps.coords.lat &&
+//       prevProps.coords.lng === nextProps.coords.lng
+//     );
+//   }
+
+//   return (
+//     prevProps.coords === nextProps.coords &&
+//     prevProps.setCoords === nextProps.setCoords
+//   );
+// });
