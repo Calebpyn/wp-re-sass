@@ -37,13 +37,16 @@ const ImageGridNewProperty: React.FC<ImageGridNewPropertyType> = ({
   const [isSelecting, setIsSelecting] = useState<boolean>(true);
   const [folderList, setFolderList] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isFullReload, setIsFullReload] = useState<boolean>(false);
 
   const handleImagesFunctionCall = async () => {
     const imagesResponse = await handleAllImages(folder);
     if (imagesResponse == "err") {
       console.log("Error manager pending...");
       setIsLoading(false);
+      setIsFullReload(false);
     } else {
+      setIsFullReload(false);
       setIsLoading(false);
       setImages(
         imagesResponse.map((img: ImageWithClientData) =>
@@ -61,10 +64,19 @@ const ImageGridNewProperty: React.FC<ImageGridNewPropertyType> = ({
     if (foldersResponse == "err") {
       console.log("Error manager pending...");
       setIsLoading(false);
+      setIsFullReload(false);
     } else {
       setFolderList(foldersResponse);
       setIsLoading(false);
+      setIsFullReload(false);
     }
+  };
+
+  //Call both fetch
+  const handleFullReload = () => {
+    setIsFullReload(true);
+    handleImagesFunctionCall();
+    handleFoldersFunctionCall();
   };
 
   // Handle image click
@@ -105,9 +117,13 @@ const ImageGridNewProperty: React.FC<ImageGridNewPropertyType> = ({
     handleImagesFunctionCall();
   }, [folder]);
 
-  return (
+  return isFullReload ? (
+    <div className="w-full flex justify-cenetr items-center h-full flex-col gap-5">
+      <CircularProgress />
+    </div>
+  ) : (
     <div className="w-full flex justify-start items-start flex-col gap-5">
-      <UploadFiles isNewProperty={true} />
+      <UploadFiles isNewProperty={true} handleReload={handleFullReload} />
 
       <div className="w-full flex flex-col items-start gap-5">
         <span className="">Select Images</span>

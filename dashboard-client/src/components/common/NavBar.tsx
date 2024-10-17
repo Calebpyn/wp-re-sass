@@ -11,6 +11,9 @@ import { IoIosSettings } from "react-icons/io";
 import { FaImages } from "react-icons/fa";
 import { GoFileSubmodule } from "react-icons/go";
 
+//Logo
+import logo from "../../assets/common/logo_pm.svg";
+
 function NavBar() {
   // Access the context value and setter
   const context = useContext(PageContext);
@@ -29,7 +32,13 @@ function NavBar() {
   return (
     <div className="w-[200px] top-0 h-full flex flex-col p-10 justify-between items-center left-0 shadow-lg fixed bg-main-blue z-[9999] text-white text-opacity-40">
       <div className="flex flex-col justify-start items-end w-full">
-        <span className="font-black mb-10 text-3xl text-white">LOGO</span>
+        <span className="font-black mb-10 text-white flex flex-col justify-center items-center w-full gap-2">
+          <img src={logo} className="h-[50px]" />
+
+          <span className="text-base font-normal italic">
+            {import.meta.env.VITE_REACT_APP_SASS_NAME}
+          </span>
+        </span>
 
         <span className="flex gap-10 font-light flex-col justify-start items-end">
           <span

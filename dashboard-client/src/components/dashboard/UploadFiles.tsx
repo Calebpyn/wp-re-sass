@@ -26,12 +26,12 @@ import { PageContext } from "../../App";
 //Component Type
 type UploadFilesType = {
   isNewProperty: boolean;
-  setIsParentLoading?: React.Dispatch<React.SetStateAction<boolean>>;
+  handleReload: () => void;
 };
 
 const UploadFiles: React.FC<UploadFilesType> = ({
   isNewProperty,
-  setIsParentLoading,
+  handleReload,
 }) => {
   // Access the context value and setter
   const context = useContext(PageContext);
@@ -93,11 +93,8 @@ const UploadFiles: React.FC<UploadFilesType> = ({
 
   // Upload selected images
   const handleUploadImages = async () => {
-    if (isNewProperty) {
-      setIsParentLoading!(true);
-    } else {
-      setIsLoading(true);
-    }
+    setIsLoading(true);
+
     if (!selectedFiles || selectedFiles.length === 0) {
       handleSnackbar("Select at least 1 file", "eror");
       return;
@@ -138,17 +135,15 @@ const UploadFiles: React.FC<UploadFilesType> = ({
     try {
       const results = await Promise.all(uploadPromises);
       console.log("Upload successful:", results);
+      handleReload();
+      console.log("Running image reload...");
     } catch (error) {
       console.error("Error uploading images:", error);
     }
 
     handleSnackbar("Image(s) uploaded successfully", "success");
     setSelectedFiles([]);
-    if (isNewProperty) {
-      setIsParentLoading!(false);
-    } else {
-      setIsLoading(false);
-    }
+    setIsLoading(false);
   };
 
   useEffect(() => {
