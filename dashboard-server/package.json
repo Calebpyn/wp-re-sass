@@ -3,8 +3,14 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "dev": "nodemon index.js"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   },
   "keywords": [],
   "dependencies": {
@@ -16,8 +22,11 @@
     "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
     "morgan": "^1.10.0",
-    "nodemon": "^3.1.4"
+    "nock": "^13.5.5",
+    "nodemon": "^3.1.4",
+    "supertest": "^7.0.0"
   },
   "author": "",
   "license": "ISC",

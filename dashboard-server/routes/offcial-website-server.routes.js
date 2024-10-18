@@ -98,4 +98,9 @@ router.post(
   fullUploadImage
 );
 
+//Test route
+router.get("/test", (req, res) => {
+  res.json("OK");
+});
+
 module.exports = router;
