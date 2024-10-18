@@ -7,7 +7,7 @@ import { IoMdSave } from "react-icons/io";
 
 import { allowedUsers } from "../../types/MainFrameTypes";
 import { useAuth0 } from "@auth0/auth0-react";
-import { Button, CircularProgress, TextField } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 
 function Settings() {
   const { user, logout } = useAuth0();

@@ -26,7 +26,7 @@ import { PageContext } from "../../App";
 //Component Type
 type UploadFilesType = {
   isNewProperty: boolean;
-  handleReload: () => void;
+  handleReload?: () => void;
 };
 
 const UploadFiles: React.FC<UploadFilesType> = ({
@@ -131,7 +131,7 @@ const UploadFiles: React.FC<UploadFilesType> = ({
     try {
       const results = await Promise.all(uploadPromises);
       console.log("Upload successful:", results);
-      handleReload();
+      handleReload!();
       console.log("Running image reload...");
     } catch (error) {
       console.error("Error uploading images:", error);
