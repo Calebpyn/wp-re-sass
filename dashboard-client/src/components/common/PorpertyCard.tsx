@@ -131,7 +131,7 @@ const PorpertyCard: React.FC<PropertyCardProps> = ({
                 isOpen ? "to-transparent" : "to-white"
               } w-full h-full flex flex-col justify-end items-end`}
             ></div>
-            <span className="">
+            <span className="whitespace-pre-wrap">
               {lang == "EN" ? desc : lang == "ES" ? desc_es : null}
             </span>
           </div>

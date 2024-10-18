@@ -90,7 +90,7 @@ const InfoReview: React.FC<InfoReviewType> = ({ newPropertyInfo }) => {
       <div className="w-[50%] pl-10 h-full flex flex-col justify-start items-start">
         <span className="h-[7%]">Description:</span>
 
-        <span className="pl-5 h-[70%] w-full overflow-y-auto">
+        <span className="pl-5 h-[70%] w-full overflow-y-auto whitespace-pre-wrap">
           {lang == "EN"
             ? newPropertyInfo.desc
             : lang == "ES"

@@ -2,7 +2,6 @@
 
 //Types
 import { propertyFetchType } from "../../../types/PropertyInfoType";
-import ImageGrid from "./Images/ImageGrid";
 import ImageGridNewProperty from "./Images/ImageGridNewProperty";
 
 //Porps type

@@ -15,7 +15,6 @@ import {
 import { useEffect, useState } from "react";
 
 //Icons
-import { GrCheckboxSelected } from "react-icons/gr";
 import { FaExternalLinkAlt } from "react-icons/fa";
 
 //Types
@@ -198,7 +197,10 @@ const ImageGridNewProperty: React.FC<ImageGridNewPropertyType> = ({
                         : ""
                     } tr`}
                   >
-                    <GrCheckboxSelected className="text-xl text-white" />
+                    {/* <GrCheckboxSelected className="text-xl text-white" /> */}
+                    <span className="text-white">
+                      {newPropertyInfo.imgs.indexOf(image.image_url) + 1}
+                    </span>
                   </div>
 
                   {!isSelecting ? (
