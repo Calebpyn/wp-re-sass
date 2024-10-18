@@ -1,5 +1,3 @@
-import React from "react";
-
 //Components
 import ImageGrid from "./ImagesPage/ImageGrid";
 
