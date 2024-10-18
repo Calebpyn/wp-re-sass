@@ -9,7 +9,6 @@ import {
   Alert,
   Button,
   CircularProgress,
-  circularProgressClasses,
   IconButton,
   Snackbar,
   SnackbarCloseReason,

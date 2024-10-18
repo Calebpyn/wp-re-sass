@@ -289,26 +289,7 @@ const NewProperty: React.FC<NewPropertyType> = ({
             <button
               className="px-5 py-2 bg-zinc-200 hover:bg-zinc-400 tr"
               onClick={() => {
-                if (stageState == 0) {
-                  if (
-                    newPropertyInfo.atts_en.length !=
-                    newPropertyInfo.atts_es.length
-                  ) {
-                    setSnackbarStatus("error");
-                    setSnackBarMessage(
-                      "Attributtes have to have the same lenght..."
-                    );
-                    handleClick();
-                  } else {
-                    if (stageState < 3) {
-                      setStageState(stageState + 1);
-                    }
-                  }
-                } else {
-                  if (stageState < 3) {
-                    setStageState(stageState + 1);
-                  }
-                }
+                setStageState(stageState + 1);
               }}
             >
               Next

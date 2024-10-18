@@ -41,11 +41,7 @@ const UploadFiles: React.FC<UploadFilesType> = ({
     throw new Error("SomeComponent must be used within a PageContext.Provider");
   }
 
-  const { currentPage, setCurrentPage } = context;
-
-  const changePage = (value: number) => {
-    setCurrentPage(value); // Example of changing the page number
-  };
+  const { setCurrentPage } = context;
 
   //Refs
   const imageInput = useRef<any>();
@@ -216,7 +212,7 @@ const UploadFiles: React.FC<UploadFilesType> = ({
     </React.Fragment>
   );
 
-  return isLoading && !isNewProperty ? (
+  return isLoading ? (
     <div className="w-full h-full flex flex-col p-10 font-light justify-center items-center">
       <CircularProgress />
     </div>
