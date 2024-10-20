@@ -56,10 +56,10 @@ const CarouselDisplay: React.FC<CarouselDisplayType> = ({ imgs, width }) => {
           <IoIosArrowBack />
         </span>
 
-        <span className="flex items-center gap-2">
+        <span className="flex items-center gap-2 w-[80%] overflow-x-auto justify-center">
           {imgs.map((_, idx) => (
             <div
-              className={`h-[5px] w-[5px] bg-zinc-300 rounded-full hover:scale-105 tr hover:bg-zinc-800 cursor-pointer`}
+              className={`h-[5px] min-w-[5px] bg-zinc-300 rounded-full hover:scale-105 tr hover:bg-zinc-800 cursor-pointer`}
               onClick={() => setSelectedImage(idx)}
               key={idx}
               style={{

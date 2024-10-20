@@ -1,4 +1,10 @@
-import { createContext, Dispatch, SetStateAction, useState } from "react";
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 //Router
 import { HashRouter, Route, Routes } from "react-router-dom";
 
@@ -30,6 +36,10 @@ function App() {
   const [currentPage, setCurrentPage] = useState<number>();
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>();
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, []);
 
   return (
     <PageContext.Provider value={{ currentPage, setCurrentPage }}>

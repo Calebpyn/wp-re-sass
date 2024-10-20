@@ -99,23 +99,25 @@ const getPropertyById = async (req, res) => {
       return res.json([]);
     }
 
-    // Fetch all related attributes for the properties
-    const propertyIds = properties.map((property) => property.id);
-    const { data: attributes, error: attributesError } = await supabase
-      .from("att")
-      .select("*")
-      .in("fk_property", propertyIds);
+    res.json(properties);
 
-    if (attributesError) throw attributesError;
+    // // Fetch all related attributes for the properties
+    // const propertyIds = properties.map((property) => property.id);
+    // const { data: attributes, error: attributesError } = await supabase
+    //   .from("att")
+    //   .select("*")
+    //   .in("fk_property", propertyIds);
 
-    // Combine properties with their related attributes
-    const propertiesWithAttributes = properties.map((property) => ({
-      ...property,
-      atts: attributes.filter((att) => att.fk_property === property.id),
-    }));
+    // if (attributesError) throw attributesError;
 
-    // Send the combined data
-    res.json(propertiesWithAttributes);
+    // // Combine properties with their related attributes
+    // const propertiesWithAttributes = properties.map((property) => ({
+    //   ...property,
+    //   atts: attributes.filter((att) => att.fk_property === property.id),
+    // }));
+
+    // // Send the combined data
+    // res.json(propertiesWithAttributes);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -163,23 +165,24 @@ const getAllForSale = async (req, res) => {
       return res.json([]);
     }
 
-    // Fetch all related attributes for the properties
-    const propertyIds = properties.map((property) => property.id);
-    const { data: attributes, error: attributesError } = await supabase
-      .from("att")
-      .select("*")
-      .in("fk_property", propertyIds);
+    res.json(properties);
+    // // Fetch all related attributes for the properties
+    // const propertyIds = properties.map((property) => property.id);
+    // const { data: attributes, error: attributesError } = await supabase
+    //   .from("att")
+    //   .select("*")
+    //   .in("fk_property", propertyIds);
 
-    if (attributesError) throw attributesError;
+    // if (attributesError) throw attributesError;
 
-    // Combine properties with their related attributes
-    const propertiesWithAttributes = properties.map((property) => ({
-      ...property,
-      atts: attributes.filter((att) => att.fk_property === property.id),
-    }));
+    // // Combine properties with their related attributes
+    // const propertiesWithAttributes = properties.map((property) => ({
+    //   ...property,
+    //   atts: attributes.filter((att) => att.fk_property === property.id),
+    // }));
 
     // Send the combined data
-    res.json(propertiesWithAttributes);
+    // res.json(propertiesWithAttributes);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -201,23 +204,25 @@ const getAllForRent = async (req, res) => {
       return res.json([]);
     }
 
-    // Fetch all related attributes for the properties
-    const propertyIds = properties.map((property) => property.id);
-    const { data: attributes, error: attributesError } = await supabase
-      .from("att")
-      .select("*")
-      .in("fk_property", propertyIds);
+    res.json(properties);
 
-    if (attributesError) throw attributesError;
+    // // Fetch all related attributes for the properties
+    // const propertyIds = properties.map((property) => property.id);
+    // const { data: attributes, error: attributesError } = await supabase
+    //   .from("att")
+    //   .select("*")
+    //   .in("fk_property", propertyIds);
 
-    // Combine properties with their related attributes
-    const propertiesWithAttributes = properties.map((property) => ({
-      ...property,
-      atts: attributes.filter((att) => att.fk_property === property.id),
-    }));
+    // if (attributesError) throw attributesError;
 
-    // Send the combined data
-    res.json(propertiesWithAttributes);
+    // // Combine properties with their related attributes
+    // const propertiesWithAttributes = properties.map((property) => ({
+    //   ...property,
+    //   atts: attributes.filter((att) => att.fk_property === property.id),
+    // }));
+
+    // // Send the combined data
+    // res.json(propertiesWithAttributes);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
